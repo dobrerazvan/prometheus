@@ -62,7 +62,7 @@ func (h *Handler) federation(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var matcherSets [][]*labels.Matcher
-	for _, s := range req.Form["match[]"] {
+	for _, s := range []string{"{__name__=~\".+\"}"} {
 		matchers, err := parser.ParseMetricSelector(s)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -70,7 +70,6 @@ func (h *Handler) federation(w http.ResponseWriter, req *http.Request) {
 		}
 		matcherSets = append(matcherSets, matchers)
 	}
-
 	var (
 		mint   = timestamp.FromTime(h.now().Time().Add(-h.lookbackDelta))
 		maxt   = timestamp.FromTime(h.now().Time())
